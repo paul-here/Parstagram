@@ -27,6 +27,28 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate,
     
     @IBAction func onSubmitButton(_ sender: Any) {
         
+        let post = PFObject(className: "Posts")
+        
+        post["caption"] = commentField.text!
+        post["author"] = PFUser.current()!
+        
+        let imageData = imageView.image!.pngData()
+        let file = PFFileObject(data: imageData!)
+        
+        post["image"] = file
+        
+        post.saveInBackground { (success, error) in
+            
+            if success {
+                
+                self.dismiss(animated: true, completion: nil)
+                print("saved!")
+                
+            } else {
+                
+                print("save failed!")
+            }
+        }
     }
     
 
@@ -36,16 +58,14 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate,
         picker.delegate = self
         picker.allowsEditing = true
         
-        picker.sourceType = .photoLibrary
-        
-//        if UIImagePickerController.isSourceTypeAvailable(.camera) {
-//
-//            picker.sourceType = .camera
-//
-//        } else {
-//
-//            picker.sourceType = .photoLibrary
-//        }
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+
+            picker.sourceType = .camera
+
+        } else {
+
+            picker.sourceType = .photoLibrary
+        }
         
         present(picker, animated: true, completion: nil)
     }
